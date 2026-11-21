@@ -1,0 +1,21 @@
+# Python 缓存与虚拟环境
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+
+# 测试缓存
+.pytest_cache/
+
+# IDE 配置 (PyCharm / VSCode)
+.idea/
+.vscode/
+
+# 本项目运行期产生的日志与本地测试数据
+*.log
+data/
+
+# 环境变量与密钥文件
+.env
+.env.*
+!.env.example
