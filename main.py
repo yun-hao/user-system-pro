@@ -1,3 +1,7 @@
+try:
+    import readline
+except ImportError:
+    pass
 import logging
 
 import config
