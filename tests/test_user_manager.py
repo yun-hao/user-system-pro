@@ -26,23 +26,22 @@ def test_add_and_list_users(tmp_path: Path) -> None:
     assert users[1].age is None
 
 
-
-def test_persistence_across_instances(tmp_path):
+def test_persistence_across_instances(tmp_path) -> None:
     # 1. Arrange
     file_path = tmp_path / "users.json"
 
-
     # 2. Act（执行）
     manager1 = UserManager(file_path)
-    u1 = manager1.add_user(name="张三", age=20, email="zs@example.com", phone="13800000001")
+    manager1.add_user(name="张三", age=20, email="zs@example.com", phone="13800000001")
 
     manager2 = UserManager(file_path)
     users = manager2.list_users()
-    #3
+    # 3
     assert users[0].name == "张三"
     assert users[0].age == 20
 
-def test_add_user_validation_error(tmp_path):
+
+def test_add_user_validation_error(tmp_path) -> None:
     # 1. Arrange
     file_path = tmp_path / "users.json"
     manager = UserManager(file_path)
@@ -60,7 +59,7 @@ def test_add_user_validation_error(tmp_path):
         manager.add_user(name="张三", age=True)
 
 
-def test_get_and_delete_user_not_found(tmp_path):
+def test_get_and_delete_user_not_found(tmp_path) -> None:
     file_path = tmp_path / "users.json"
     manager = UserManager(file_path)
     with pytest.raises(UserNotFoundError):
@@ -70,11 +69,60 @@ def test_get_and_delete_user_not_found(tmp_path):
         manager.delete_user(9999)
 
 
-
-def test_load_corrupted_json_raises_storage_error(tmp_path):
+def test_load_corrupted_json_raises_storage_error(tmp_path) -> None:
     file_path = tmp_path / "users.json"
     file_path.write_text("{bad json")
     with pytest.raises(StorageError):
-        manager = UserManager(file_path)
+        UserManager(file_path)
 
 
+def test_update_user_success(tmp_path) -> None:
+    file_path = tmp_path / "users.json"
+    manager = UserManager(file_path)
+    manager.add_user(name="张三", age=20, email="zs@example.com", phone="13800000001")
+
+    manager.update_user(user_id=1001, age=40, email=None)
+    users1 = manager.list_users()
+    assert users1[0].id == 1001
+    assert users1[0].age == 40
+    assert users1[0].name == '张三'
+    assert users1[0].email == "zs@example.com"
+    assert users1[0].phone == "13800000001"
+
+    manager = UserManager(file_path)
+    users2 = manager.list_users()
+    assert users2[0].id == 1001
+    assert users2[0].age == 40
+    assert users2[0].name == '张三'
+    assert users2[0].email == "zs@example.com"
+    assert users2[0].phone == "13800000001"
+
+
+def test_update_user_errors(tmp_path: Path) -> None:
+    file_path = tmp_path / "users.json"
+    manager = UserManager(file_path)
+    manager.add_user(name="张三", age=20, email="zs@example.com", phone="13800000001")
+    users = manager.list_users()
+
+    with pytest.raises(UserNotFoundError):
+        manager.update_user(user_id=9999)
+    with pytest.raises(ValidationError):
+        manager.update_user(user_id=1001, name='王五', age=-1)
+    assert users[0].name == '张三'
+
+    with pytest.raises(ValidationError):
+        manager.update_user(user_id=1001, email="zsexample.com")
+    with pytest.raises(ValidationError):
+        manager.update_user(user_id=1001, phone="1111111")
+    with pytest.raises(ValidationError):
+        manager.update_user(user_id=True)
+
+
+def test_delete_user_success(tmp_path: Path) -> None:
+    file_path = tmp_path / "users.json"
+    manager = UserManager(file_path)
+    manager.add_user(name="张三", age=20, email="zs@example.com", phone="13800000001")
+
+    manager.delete_user(user_id=1001)
+    manager = UserManager(file_path)
+    assert manager.list_users() == []

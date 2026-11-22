@@ -1,5 +1,4 @@
 import logging
-from idlelib.runscript import indent_message
 
 import config
 from models import StorageError, UserNotFoundError, ValidationError
@@ -28,20 +27,23 @@ def main() -> None:
         exit(1)
     while True:
         print('-------用户管理系统--------')
-        print('1. 新增用户\n2. 查看所有用户\n3. 按ID查询用户\n4. 删除用户\n5. 退出')
-        choice = input('请输入你的选择')
+        print('1. 新增用户\n2. 查看所有用户\n3. 按ID查询用户\n4. 删除用户\n5. 修改用户\n6. 退出')
+        choice = input('请输入你的选择').strip()
         match choice:
             case '1':
                 try:
                     name = input('请输入名字')
-                    age = int(input('请输入年龄(回车跳过): ')) or None
+                    raw_age = input('请输入年龄(回车跳过): ').strip()
+                    age = int(raw_age) if raw_age else None
                     email = input('请输入邮箱(回车跳过): ').strip() or None
                     phone = input('请输入电话(回车跳过): ').strip() or None
                     user = manager.add_user(name, age, email, phone)
                     print(f'{user}增加成功')
                 except ValueError as e:
-                    logger.warning('年龄输入格式')
+                    logger.warning('请输入有效整数')
                 except ValidationError as e:
+                    print(e)
+                except StorageError as e:
                     print(e)
 
             case '2':
@@ -59,9 +61,8 @@ def main() -> None:
                         user = manager.get_user(target_id)
                         user_info = {'name': user.name, 'age': user.age, 'email': user.email, 'phone': user.phone}
                         print(user_info)
-
                 except ValueError as e:
-                    logger.warning('输入目标id格式不对')
+                    logger.warning('请输入有效整数')
                 except ValidationError as e:
                     print(e)
                 except UserNotFoundError as e:
@@ -72,21 +73,44 @@ def main() -> None:
                 try:
                     target_id_input = input('输入目标id').strip()
                     if not target_id_input:
-                        raise ValidationError('目标为空')
+                        raise ValidationError('目标id不能是空格')
                     else:
                         target_id = int(target_id_input)
                         manager.delete_user(target_id)
                         print(f'{target_id}删除成功')
 
                 except ValueError as e:
-                    logger.warning('输入目标id格式不对')
+                    logger.warning('请输入有效整数')
                 except ValidationError as e:
                     print(e)
                 except UserNotFoundError as e:
                     print(e)
                 except StorageError as e:
                     print(e)
+
             case '5':
+                try:
+                    target_id_input = input('输入目标id').strip()
+                    if not target_id_input:
+                        raise ValidationError('目标id不能是空格')
+                    else:
+                        target_id = int(target_id_input)
+                    name = input('请修改名字').strip() or None
+                    raw_age = input('请输入年龄(回车跳过): ').strip()
+                    age = int(raw_age) if raw_age else None
+                    email = input('请修改邮箱(回车跳过): ').strip() or None
+                    phone = input('请修改电话(回车跳过): ').strip() or None
+                    target_user = manager.update_user(target_id, name, age, email, phone)
+                    print(f'{target_user.id}成功修改为{target_user.name}')
+                except ValueError as e:
+                    logger.warning('请输入有效整数')
+                except ValidationError as e:
+                    print(e)
+                except UserNotFoundError as e:
+                    print(e)
+                except StorageError as e:
+                    print(e)
+            case '6':
                 break
             case _:
                 print('请输入正确的选择')
