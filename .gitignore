@@ -19,3 +19,4 @@ data/
 .env
 .env.*
 !.env.example
+backups/
