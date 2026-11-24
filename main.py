@@ -1,3 +1,5 @@
+from storage import SQLiteStorage, MySQLStorage
+
 try:
     import readline
 except ImportError:
@@ -21,11 +23,18 @@ def setup_logging() -> None:
         ]
     )
 
+def create_storage():
+    if config.STORAGE_TYPE == 'sqlite':
+        return SQLiteStorage(config.USERS_FILE)
+    if config.STORAGE_TYPE == 'mysql':
+        return MySQLStorage(**config.MYSQL_CONFIG)
+
 
 def main() -> None:
     setup_logging()
     try:
-        manager = UserManager(config.USERS_FILE)
+        storage = create_storage()
+        manager = UserManager(storage)
     except StorageError as e:
         print(e)
         exit(1)

@@ -8,9 +8,8 @@ logger = logging.getLogger(__name__)
 
 
 class UserManager:
-    def __init__(self, file_path: Path):
-        self.file_path = file_path
-        self.storage = SQLiteStorage(self.file_path)
+    def __init__(self, storage):
+        self.storage = storage
 
     def add_user(self, name: str, age: int | None = None, email: str | None = None, phone: str | None = None) -> User:
         name = self._validate_name(name)
