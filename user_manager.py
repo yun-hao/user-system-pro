@@ -1,8 +1,6 @@
 import logging
-from pathlib import Path
 
 from models import User, UserNotFoundError, ValidationError
-from storage import SQLiteStorage
 
 logger = logging.getLogger(__name__)
 
@@ -25,6 +23,7 @@ class UserManager:
         return user
 
     def get_user(self, user_id: int) -> User:
+        user_id = self._validate_id(user_id)
         user = self.storage.get_by_id(user_id)
         if user is None:
             logger.warning('%s 用户未找到,获取失败', user_id)
@@ -35,6 +34,7 @@ class UserManager:
         return self.storage.list_all()
 
     def delete_user(self, user_id: int) -> None:
+        user_id = self._validate_id(user_id)
         deleted = self.storage.delete(user_id)
         if not deleted:
             logger.warning('没找到')

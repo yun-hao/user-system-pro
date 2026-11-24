@@ -183,7 +183,7 @@ class MySQLStorage:
             if conn:
                 conn.rollback()
             logger.error(e)
-            raise StorageError(f'字段 {email} 冲突用户增加失败')
+            raise StorageError(f'字段 {email} 冲突用户增加失败') from e
         except pymysql.MySQLError as e:
             if conn:
                 conn.rollback()

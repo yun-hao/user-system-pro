@@ -1,5 +1,3 @@
-from pathlib import Path
-
 import pytest
 
 import config
@@ -80,7 +78,7 @@ def test_get_and_delete_user_not_found(manager) -> None:
         manager.delete_user(9999)
 
 
-def test_load_corrupted_json_raises_storage_error(tmp_path) -> None:
+def test_load_corrupted_db_raises_storage_error(tmp_path) -> None:
     file_path = tmp_path / "users.db"
     file_path.write_text("not a valid sqlite file")
     with pytest.raises(StorageError):
@@ -108,11 +106,12 @@ def test_update_user_success(manager) -> None:
 
 def test_update_user_errors(manager) -> None:
     manager.add_user(name="张三", age=20, email="zs@example.com", phone="13800000001")
-    users = manager.list_users()
+
 
     with pytest.raises(UserNotFoundError):
         manager.update_user(user_id=9999)
     with pytest.raises(ValidationError):
+        users = manager.list_users()
         manager.update_user(user_id=1, name='王五', age=-1)
     assert users[0].name == '张三'
 

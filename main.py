@@ -28,6 +28,7 @@ def create_storage():
         return SQLiteStorage(config.USERS_FILE)
     if config.STORAGE_TYPE == 'mysql':
         return MySQLStorage(**config.MYSQL_CONFIG)
+    raise ValueError(f"不支持的 STORAGE_TYPE: {config.STORAGE_TYPE}")
 
 
 def main() -> None:
@@ -35,7 +36,7 @@ def main() -> None:
     try:
         storage = create_storage()
         manager = UserManager(storage)
-    except StorageError as e:
+    except (StorageError,ValueError) as e:
         print(e)
         exit(1)
     while True:
@@ -60,9 +61,12 @@ def main() -> None:
                     print(e)
 
             case '2':
-                all_users = manager.list_users()
-                users_map = {user.id: user.name for user in all_users}
-                print(users_map)
+                try:
+                    all_users = manager.list_users()
+                    users_map = {user.id: user.name for user in all_users}
+                    print(users_map)
+                except StorageError as e:
+                    print(e)
 
             case '3':
                 try:
