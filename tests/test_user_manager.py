@@ -26,7 +26,6 @@ def manager(request, tmp_path):
             conn.close()
         return UserManager(storage)
 
-
 def test_add_and_list_users(manager) -> None:
     # 1. Arrange（准备）：在 pytest 提供的临时目录里拼一个测试文件路径，实例化管理器
 

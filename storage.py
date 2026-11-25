@@ -4,7 +4,8 @@ from pathlib import Path
 
 import pymysql
 
-from models import User, StorageError, UserNotFoundError
+import config
+from models import User, StorageError
 
 logger = logging.getLogger(__name__)
 
@@ -272,3 +273,11 @@ class MySQLStorage:
         finally:
             if conn:
                 conn.close()
+
+
+def create_storage():
+    if config.STORAGE_TYPE == 'sqlite':
+        return SQLiteStorage(config.USERS_FILE)
+    if config.STORAGE_TYPE == 'mysql':
+        return MySQLStorage(**config.MYSQL_CONFIG)
+    raise ValueError('不支持的数据类型')

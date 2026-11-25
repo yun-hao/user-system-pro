@@ -7,7 +7,7 @@ load_dotenv()
 LOG_LEVEL = os.getenv("LOG_LEVEL", "INFO").upper()
 _data_dir = os.getenv("DATA_DIR", "data")
 STORAGE_TYPE = os.getenv("STORAGE_TYPE", "sqlite").strip().lower()
-SQLITE_DB_PATH = Path(os.getenv("USERS_FILE", "data/users.db"))
+
 MYSQL_CONFIG={
     "host": os.getenv("MYSQL_HOST", "127.0.0.1"),
     "port": int(os.getenv("MYSQL_PORT", 3306)),

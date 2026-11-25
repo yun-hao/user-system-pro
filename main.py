@@ -1,4 +1,4 @@
-from storage import SQLiteStorage, MySQLStorage
+from storage import  create_storage
 
 try:
     import readline
@@ -23,12 +23,7 @@ def setup_logging() -> None:
         ]
     )
 
-def create_storage():
-    if config.STORAGE_TYPE == 'sqlite':
-        return SQLiteStorage(config.USERS_FILE)
-    if config.STORAGE_TYPE == 'mysql':
-        return MySQLStorage(**config.MYSQL_CONFIG)
-    raise ValueError(f"不支持的 STORAGE_TYPE: {config.STORAGE_TYPE}")
+
 
 
 def main() -> None:
